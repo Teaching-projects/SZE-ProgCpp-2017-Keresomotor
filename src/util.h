@@ -7,7 +7,8 @@
 #include <string>
 #include <vector>
 
-std::string lower(const std::string& text);
+std::string& filter(std::string& text);
+std::string& lower(std::string& text);
 std::vector<std::string> split(const std::string& text);
 
 #endif
