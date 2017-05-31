@@ -22,6 +22,10 @@ class Index {
 public:
     bool add(const std::string& document_path);
     bool contains(const std::string& document_path) const;
+    std::uint32_t count_documents() const ;
+    std::uint32_t count_documents(const std::string& word) const ;
+    std::uint32_t count_words(const std::uint32_t document_id) const ;
+    std::uint32_t count_words(const std::uint32_t document_id, const std::string& word) const;
 private:
     std::string load_document(const std::string& document_path);
     std::vector<std::string> create_terms(const std::vector<std::string>& tokens);

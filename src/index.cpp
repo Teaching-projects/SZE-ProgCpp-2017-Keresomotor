@@ -33,6 +33,37 @@ bool Index::contains(const std::string& document_path) const {
     return false;
 }
 
+
+std::uint32_t Index::count_documents() const {
+    return documents_.size();
+}
+
+std::uint32_t Index::count_documents(const std::string& word) const {
+    auto term = terms_.find(word);
+    if (term != terms_.end()) {
+        return term->second.size(); 
+    }
+    return 0;
+}
+
+std::uint32_t Index::count_words(const std::uint32_t document_id) const {
+    if (document_id < documents_.size()) {
+        return documents_[document_id].tokens_count;
+    }
+    return 0;
+}
+
+std::uint32_t Index::count_words(const std::uint32_t document_id, const std::string& word) const {
+    auto term = terms_.find(word);
+    if (term != terms_.end()) {
+        auto document = term->second.find(document_id);
+        if (document != term->second.end()) {
+            return document->second;
+        }
+    }
+    return 0;
+}
+
 std::string Index::load_document(const std::string& document_path) {
     std::fstream file(document_path);
     if (!file.is_open()) {
