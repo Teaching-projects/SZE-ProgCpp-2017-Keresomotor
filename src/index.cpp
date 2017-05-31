@@ -33,7 +33,6 @@ bool Index::contains(const std::string& document_path) const {
     return false;
 }
 
-
 std::uint32_t Index::count_documents() const {
     return documents_.size();
 }
