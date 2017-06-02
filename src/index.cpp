@@ -23,6 +23,28 @@ bool Index::add(const std::string& document_path) {
     return true;
 }
 
+std::vector<std::uint32_t> Index::intersection(const std::vector<std::string>& words) {
+    // Egyes keresett szavak, mely dokumentumokban találhatók meg.
+    std::unordered_map<std::uint32_t, std::uint32_t> occurences;
+    for (const auto& word : words) {
+        if (terms_.find(word) != terms_.end()) {
+            for (const auto& doc : terms_[word]) {
+                ++occurences[doc.first];
+            }
+        }
+    }
+
+    // Azon dokumentumok kigyűjtése, amelyek az összes keresett szót tartalmazzák.
+    std::vector<std::uint32_t> intersection;
+    for (const auto& occurence : occurences) {
+        if (occurence.second == words.size()) {
+            intersection.push_back(occurence.first);
+        }
+    }
+
+    return intersection;
+}
+
 //TODO: Optimalizálni!
 bool Index::contains(const std::string& document_path) const {
     for (auto& document : documents_) {
@@ -61,6 +83,13 @@ std::uint32_t Index::count_words(const std::uint32_t document_id, const std::str
         }
     }
     return 0;
+}
+
+std::string Index::document_name(const std::uint32_t document_id) const {
+    if (document_id < documents_.size()) {
+        return documents_[document_id].path;
+    }
+    return "";
 }
 
 std::string Index::load_document(const std::string& document_path) {
