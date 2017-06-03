@@ -1,5 +1,12 @@
 #include "engine.h"
 
+std::string Engine::get_input() {
+    std::cout << "> ";
+    std::string input;
+    std::getline(std::cin, input);
+    return input;
+}
+
 void Engine::index(const std::vector<std::string>& paths) {
     for (const auto& path : paths) {
         if (is_file(path)) {
@@ -10,6 +17,42 @@ void Engine::index(const std::vector<std::string>& paths) {
             std::cerr << path << " not a file or directory!" << std::endl;
         }
     }
+}
+
+std::string Engine::parse_command(const std::string& query) {
+    auto tokens = split(lower(query));
+    if (tokens.size() > 0) {
+        return tokens[0];
+    }
+    return "";
+}
+
+std::vector<std::string> Engine::parse_params(const std::string& query) {
+    auto tokens = split(lower(query));
+    if (tokens.size() > 0) {
+        tokens.erase(tokens.begin());
+    }
+    return tokens;
+}
+
+void Engine::search(const std::vector<std::string>& words) {
+    auto documents = index_.intersection(words);
+    std::vector<std::pair<double, std::uint32_t>> scores;
+
+    for (const auto& document : documents) {
+        scores.push_back(std::make_pair(score(document, words), document));
+    }
+
+    std::sort(scores.rbegin(), scores.rend());
+    for (const auto& score : scores) {
+        std::cout << index_.document_name(score.second) << ": " << score.first << std::endl;
+    }
+}
+
+double Engine::idf(const std::string& word) {
+    double all = index_.count_documents();
+    double contains = index_.count_documents(word);
+    return std::log(all / (contains + 1)) + 1;
 }
 
 void Engine::index_dir(const std::string& path) {
@@ -73,4 +116,18 @@ std::vector<std::string> Engine::list_files(const std::string& path) {
         closedir(iterator);
     }
     return files;
+}
+
+double Engine::score(const std::uint32_t document_id, const std::vector<std::string>& words) {
+    double score = 0;
+    for (const auto& word : words) {
+        score += idf(word) * tf(document_id, word);
+    }
+    return score;
+}
+
+double Engine::tf(const std::uint32_t document_id, const std::string& word) {
+    double all = index_.count_words(document_id);
+    double contains = index_.count_words(document_id, word);
+    return contains / all;
 }
