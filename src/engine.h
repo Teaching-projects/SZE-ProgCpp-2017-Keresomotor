@@ -13,23 +13,24 @@
 #include "util.h"
 
 class Engine {
-public:
-    std::string get_input();
+  public:
+    Engine();
     void index(const std::vector<std::string>& paths);
+    void search(const std::vector<std::string>& words);
+    std::string get_input();
     std::string parse_command(const std::string& query);
     std::vector<std::string> parse_params(const std::string& query);
-    void search(const std::vector<std::string>& words);
-private:
-    double idf(const std::string& word);
+  private:
     void index_dir(const std::string& path);
     void index_file(const std::string& path);
+    double score(const std::uint32_t document_id, const std::vector<std::string>& words);
+    double idf(const std::string& word);
+    double tf(const std::uint32_t document_id, const std::string& word);
     bool is_dir(const std::string& path) const;
     bool is_file(const std::string& path) const;
     std::vector<std::string> list_dirs(const std::string& path);
     std::vector<std::string> list_files(const std::string& path);
-    double score(const std::uint32_t document_id, const std::vector<std::string>& words);
-    double tf(const std::uint32_t document_id, const std::string& word);
-private:
+
     Index index_;
 };
 

@@ -13,26 +13,33 @@
 #include "util.h"
 
 struct Document {
-public:
+  public:
     std::string path;
     std::uint32_t tokens_count;
 };
 
 class Index {
-public:
+  public:
     bool add(const std::string& document_path);
-    std::vector<std::uint32_t> intersection(const std::vector<std::string>& words);
+    bool load();
+    bool save();
     bool contains(const std::string& document_path) const;
     std::uint32_t count_documents() const;
     std::uint32_t count_documents(const std::string& word) const;
     std::uint32_t count_words(const std::uint32_t document_id) const;
     std::uint32_t count_words(const std::uint32_t document_id, const std::string& word) const;
     std::string document_name(const std::uint32_t document_id) const;
-private:
+    std::vector<std::uint32_t> intersection(const std::vector<std::string>& words);
+
+  private:
+    bool load_documents();
+    bool load_terms();
+    bool save_documents();
+    bool save_terms();
     std::string load_document(const std::string& document_path);
     std::vector<std::string> create_terms(const std::vector<std::string>& tokens);
     std::vector<std::string> create_tokens(const std::string& text);
-private:
+
     std::vector<Document> documents_;
     std::unordered_map<std::string, std::map<std::uint32_t, std::uint32_t>> terms_;
 };
