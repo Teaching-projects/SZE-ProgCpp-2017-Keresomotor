@@ -37,7 +37,7 @@ class Index {
     bool save_documents();
     bool save_terms();
     std::string load_document(const std::string& document_path);
-    std::vector<std::string> create_terms(const std::vector<std::string>& tokens);
+    std::map<std::string, std::uint32_t> create_terms(const std::vector<std::string>& tokens);
     std::vector<std::string> create_tokens(const std::string& text);
 
     std::vector<Document> documents_;

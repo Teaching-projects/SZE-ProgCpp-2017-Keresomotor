@@ -17,7 +17,7 @@ bool Index::add(const std::string& document_path) {
     std::uint32_t document_id = documents_.size();
     documents_.push_back({document_path, static_cast<std::uint32_t>(tokens.size())});
     for (auto& term : terms) {
-        ++terms_[term][document_id];
+        terms_[term.first][document_id] += term.second;
     }
     return true;
 }
@@ -265,11 +265,11 @@ std::string Index::load_document(const std::string& document_path) {
     return stream.str();
 }
 
-std::vector<std::string> Index::create_terms(const std::vector<std::string>& tokens) {
-    std::vector<std::string> terms;
+std::map<std::string, std::uint32_t> Index::create_terms(const std::vector<std::string>& tokens) {
+    std::map<std::string, std::uint32_t> terms;
     for (auto& token : tokens) {
         for (std::size_t length = 2; length <= token.size(); ++length) {
-           terms.push_back(token.substr(0, length));
+            ++terms[token.substr(0, length)];
         }
     }
     return terms;
