@@ -20,6 +20,7 @@ class Engine {
     std::string get_input();
     std::string parse_command(const std::string& query);
     std::vector<std::string> parse_params(const std::string& query);
+
   private:
     void index_dir(const std::string& path);
     void index_file(const std::string& path);

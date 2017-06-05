@@ -19,7 +19,6 @@ bool Index::add(const std::string& document_path) {
     for (auto& term : terms) {
         ++terms_[term][document_id];
     }
-
     return true;
 }
 
@@ -117,7 +116,6 @@ std::vector<std::uint32_t> Index::intersection(const std::vector<std::string>& w
             intersection.push_back(occurence.first);
         }
     }
-
     return intersection;
 }
 
@@ -127,27 +125,31 @@ bool Index::load_documents() {
         return false;
     }
 
-    // Letárolt dokumentumok számának beolvasása.
-    std::uint32_t documents_count = 0;
-    file.read(reinterpret_cast<char*>(&documents_count), sizeof(documents_count));
-    documents_.reserve(documents_count);
+    try {
+        // Letárolt dokumentumok számának beolvasása.
+        std::uint32_t documents_count = 0;
+        file.read(reinterpret_cast<char*>(&documents_count), sizeof(documents_count));
+        documents_.reserve(documents_count);
 
-    for (std::size_t i = 0; i < documents_count; ++i) {
-        // Dokumentum útvonalának karakterszámának beolvasása.
-        std::uint32_t path_length = 0;
-        file.read(reinterpret_cast<char*>(&path_length), sizeof(path_length));
+        for (std::size_t i = 0; i < documents_count; ++i) {
+            // Dokumentum útvonalának karakterszámának beolvasása.
+            std::uint32_t path_length = 0;
+            file.read(reinterpret_cast<char*>(&path_length), sizeof(path_length));
 
-        // Dokumentum útvonalának beolvasása.
-        std::string path;
-        path.resize(path_length);
-        file.read(&path[0], path_length);
+            // Dokumentum útvonalának beolvasása.
+            std::string path;
+            path.resize(path_length);
+            file.read(&path[0], path_length);
 
-        // Dokumentum token számának beolvasása.
-        std::uint32_t tokens_count = 0;
-        file.read(reinterpret_cast<char*>(&tokens_count), sizeof(tokens_count));
+            // Dokumentum token számának beolvasása.
+            std::uint32_t tokens_count = 0;
+            file.read(reinterpret_cast<char*>(&tokens_count), sizeof(tokens_count));
 
-        // Beolvasott adatok hozzáadása az indexhez.
-        documents_.push_back({path, tokens_count});
+            // Beolvasott adatok hozzáadása az indexhez.
+            documents_.push_back({path, tokens_count});
+        }
+    } catch (std::bad_alloc) {
+        return false;
     }
     return file.good();
 }
@@ -158,36 +160,40 @@ bool Index::load_terms() {
         return false;
     }
 
-    // Mentett termek számának beolvasása.
-    std::uint32_t terms_count = 0;
-    file.read(reinterpret_cast<char*>(&terms_count), sizeof(terms_count));
+    try {
+        // Mentett termek számának beolvasása.
+        std::uint32_t terms_count = 0;
+        file.read(reinterpret_cast<char*>(&terms_count), sizeof(terms_count));
 
-    for (std::size_t i = 0; i < terms_count; ++i) {
-        // Term karakter számának beolvasása.
-        std::uint32_t term_length = 0;
-        file.read(reinterpret_cast<char*>(&term_length), sizeof(term_length));
+        for (std::size_t i = 0; i < terms_count; ++i) {
+            // Term karakter számának beolvasása.
+            std::uint32_t term_length = 0;
+            file.read(reinterpret_cast<char*>(&term_length), sizeof(term_length));
 
-        // Term beolvasása.
-        std::string term_name;
-        term_name.resize(term_length);
-        file.read(&term_name[0], term_length);
+            // Term beolvasása.
+            std::string term_name;
+            term_name.resize(term_length);
+            file.read(&term_name[0], term_length);
 
-        // Termhez tartozó dokumentumok számának beolvasása.
-        std::uint32_t documents_count = 0;
-        file.read(reinterpret_cast<char*>(&documents_count), sizeof(documents_count));
+            // Termhez tartozó dokumentumok számának beolvasása.
+            std::uint32_t documents_count = 0;
+            file.read(reinterpret_cast<char*>(&documents_count), sizeof(documents_count));
 
-        for (std::size_t j = 0; j < documents_count; ++j) {
-            // Dokumentum id beolvasása.
-            std::uint32_t document_id = 0;
-            file.read(reinterpret_cast<char*>(&document_id), sizeof(document_id));
+            for (std::size_t j = 0; j < documents_count; ++j) {
+                // Dokumentum id beolvasása.
+                std::uint32_t document_id = 0;
+                file.read(reinterpret_cast<char*>(&document_id), sizeof(document_id));
 
-            // Dokumentumban adott term előfordulásának számának beolvasása.
-            std::uint32_t tokens_count = 0;
-            file.read(reinterpret_cast<char*>(&tokens_count), sizeof(tokens_count));
+                // Dokumentumban adott term előfordulásának számának beolvasása.
+                std::uint32_t tokens_count = 0;
+                file.read(reinterpret_cast<char*>(&tokens_count), sizeof(tokens_count));
 
-            // Beolvasott adatok hozzáadása az indexhez.
-            terms_[term_name][document_id] = tokens_count;
+                // Beolvasott adatok hozzáadása az indexhez.
+                terms_[term_name][document_id] = tokens_count;
+            }
         }
+    } catch (std::bad_alloc) {
+        return false;
     }
     return file.good();
 }
