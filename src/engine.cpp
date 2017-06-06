@@ -34,9 +34,13 @@ void Engine::search(const std::vector<std::string>& words) {
         scores.push_back(std::make_pair(score(document, words), document));
     }
 
-    std::sort(scores.rbegin(), scores.rend());
-    for (const auto& score : scores) {
-        std::cout << index_.document_name(score.second) << ": " << score.first << std::endl;
+    if (scores.size() > 0) {
+        std::sort(scores.rbegin(), scores.rend());
+        for (std::size_t i = 0; i < scores.size(); ++i) {
+            std::cout << i + 1 << ". " << index_.document_name(scores[i].second) << std::endl;
+        }
+    } else {
+        std::cout << "No results have been found!" << std::endl;
     }
 }
 

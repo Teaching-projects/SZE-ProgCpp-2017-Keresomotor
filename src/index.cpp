@@ -24,14 +24,14 @@ bool Index::add(const std::string& document_path) {
 
 bool Index::load() {
     if (!load_documents()) {
-        std::cerr << "Documents loading unsuccessful!" << std::endl;
+        std::cerr << "documents.se loading unsuccessful!" << std::endl;
         // Sikertelen betöltés esetén ürítjük az indexet, hogy ne maradjon benne szemét.
         documents_.clear();
         terms_.clear();
         return false;
     }
     if (!load_terms()) {
-        std::cerr << "Terms loading unsuccessful!" << std::endl;
+        std::cerr << "terms.se loading unsuccessful!" << std::endl;
         // Sikertelen betöltés esetén ürítjük az indexet, hogy ne maradjon benne szemét.
         documents_.clear();
         terms_.clear();
@@ -42,11 +42,11 @@ bool Index::load() {
 
 bool Index::save() {
     if (!save_documents()) {
-        std::cerr << "Documents saving unsuccessful!" << std::endl;
+        std::cerr << "documents.se saving unsuccessful!" << std::endl;
         return false;
     }
     if (!save_terms()) {
-        std::cerr << "Terms saving unsuccessful!" << std::endl;
+        std::cerr << "terms.se saving unsuccessful!" << std::endl;
         return false;
     }
     return true;
@@ -268,7 +268,7 @@ std::string Index::load_document(const std::string& document_path) {
 std::map<std::string, std::uint32_t> Index::create_terms(const std::vector<std::string>& tokens) {
     std::map<std::string, std::uint32_t> terms;
     for (auto& token : tokens) {
-        for (std::size_t length = 2; length <= token.size(); ++length) {
+        for (std::size_t length = 1; length <= token.size(); ++length) {
             ++terms[token.substr(0, length)];
         }
     }
